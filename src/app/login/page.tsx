@@ -35,12 +35,12 @@ function LoginContent() {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formData,
+        body: formData.toString(),
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || 'Invalid email or password');
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.detail || 'Invalid email or password (Login failed)');
       }
 
       const tokenData = await response.json();
@@ -54,7 +54,7 @@ function LoginContent() {
       });
 
       if (!userResponse.ok) {
-        throw new Error('Failed to fetch user details');
+        throw new Error('Failed to fetch user details after successful login');
       }
 
       const user = await userResponse.json();
