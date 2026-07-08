@@ -67,7 +67,7 @@ function LoginContent() {
       router.push(redirectUrl);
     } catch (err: unknown) {
       if (err instanceof TypeError && err.message === 'Failed to fetch') {
-        setError('Network Error: Failed to fetch. Please check if your backend URL in Vercel Environment Variables is correct, make sure it uses https://, and ensure no ad-blockers are blocking the login request.');
+        setError(`Network Error: Failed to fetch from '${apiUrl}'. Please check if your backend URL in Vercel Environment Variables is correct, make sure it uses https://, and ensure no ad-blockers are blocking the login request.`);
       } else if (err instanceof Error) {
         setError(err.message || 'An error occurred during login');
       } else {
