@@ -29,7 +29,8 @@ function LoginContent() {
       formData.append('username', email);
       formData.append('password', password);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
       const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
@@ -65,7 +66,9 @@ function LoginContent() {
       const redirectUrl = searchParams.get('redirect') || '/admin/dashboard';
       router.push(redirectUrl);
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError('Network Error: Failed to fetch. Please check if your backend URL in Vercel Environment Variables is correct, make sure it uses https://, and ensure no ad-blockers are blocking the login request.');
+      } else if (err instanceof Error) {
         setError(err.message || 'An error occurred during login');
       } else {
         setError('An error occurred during login');
