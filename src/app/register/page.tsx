@@ -24,7 +24,11 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      let apiUrl = rawApiUrl.replace(/\/$/, '');
+      if (!apiUrl.startsWith('http')) {
+        apiUrl = `https://${apiUrl}`;
+      }
       const response = await fetch(`${apiUrl}/api/v1/auth/register`, {
         method: 'POST',
         headers: {
@@ -48,7 +52,10 @@ export default function RegisterPage() {
         router.push('/login');
       }, 2000);
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        setError(`Network Error: Failed to connect to backend (${rawApiUrl}). Ensure your Vercel Environment Variable is exactly your Render URL (e.g. https://your-backend.onrender.com) and that the backend is awake.`);
+      } else if (err instanceof Error) {
         setError(err.message || 'An error occurred during registration');
       } else {
         setError('An error occurred during registration');

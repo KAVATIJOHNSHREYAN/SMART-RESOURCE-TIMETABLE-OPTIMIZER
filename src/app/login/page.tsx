@@ -30,7 +30,11 @@ function LoginContent() {
       formData.append('password', password);
 
       const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      let apiUrl = rawApiUrl.replace(/\/$/, '');
+      if (!apiUrl.startsWith('http')) {
+        apiUrl = `https://${apiUrl}`;
+      }
+      
       const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
@@ -67,7 +71,8 @@ function LoginContent() {
       router.push(redirectUrl);
     } catch (err: unknown) {
       if (err instanceof TypeError && err.message === 'Failed to fetch') {
-        setError(`Network Error: Failed to fetch from '${apiUrl}'. Please check if your backend URL in Vercel Environment Variables is correct, make sure it uses https://, and ensure no ad-blockers are blocking the login request.`);
+        const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        setError(`Network Error: Failed to connect to backend (${rawApiUrl}). Ensure your Vercel Environment Variable is exactly your Render URL (e.g. https://your-backend.onrender.com) and that the backend is awake.`);
       } else if (err instanceof Error) {
         setError(err.message || 'An error occurred during login');
       } else {
